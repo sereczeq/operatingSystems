@@ -1,5 +1,7 @@
 package lab2;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.Vector;
 
@@ -10,11 +12,14 @@ public class DiscScheduler
 	{
 		
 		int position;
+		int deadline;
+		private final Random rand = new Random();
 		
 		Task(int position)
 		{
 			
 			this.position = position;
+			deadline = rand.nextInt(1000);
 			
 		}
 		
@@ -47,7 +52,17 @@ public class DiscScheduler
 		
 	}
 	
+	private int discSize = 200;
 	private Vector<Task> tasks = new Vector<Task>();
+	
+	DiscScheduler(int discSize, int howManyTasks)
+	{
+		
+		this.discSize = discSize;
+		addRandom(howManyTasks);
+		
+	}
+	
 	
 	@SuppressWarnings("unused")
 	private void addRandom()
@@ -62,11 +77,12 @@ public class DiscScheduler
 	{
 		
 		Random rand = new Random();
-		for (int x = 0; x < howMany; x++) tasks.add(new Task(rand.nextInt(200)));
+		for (int x = 0; x < howMany; x++) tasks.add(new Task(rand.nextInt(discSize)));
 		
 	}
 	
 	
+	// Kind of like first in first out, position of the task doesn't matter
 	private int FCFS()
 	{
 		
@@ -84,6 +100,8 @@ public class DiscScheduler
 	}
 	
 	
+	// This algorithm takes "distance" between two tasks into account and moves
+	// accordingly to closest task possible
 	private int SSTF()
 	{
 		
@@ -114,6 +132,9 @@ public class DiscScheduler
 	}
 	
 	
+	// This algorithm moves the head from the first task to the very left side of
+	// the
+	// disc, then to the right and so on
 	private int SCAN()
 	{
 		
@@ -133,7 +154,7 @@ public class DiscScheduler
 			}
 		}
 		curr = new Task(0);
-		for (int x = 0, pos = 0; x <= 200; x++, pos = curr.position)
+		for (int x = 0, pos = 0; x <= discSize; x++, pos = curr.position)
 		{
 			if (tasks.contains(new Task(x)))
 			{
@@ -148,6 +169,8 @@ public class DiscScheduler
 	}
 	
 	
+	// This algorithm moves the head from the first task to the task that is closest
+	// to the left side of the disc, and then to the most right task, and so on
 	private int CSCAN()
 	{
 		
@@ -158,7 +181,7 @@ public class DiscScheduler
 		Task curr = tasks.remove(0);
 		for (int x = curr.position, pos = x; !tasks.isEmpty(); x++, pos = curr.position)
 		{
-			if (x > 200)
+			if (x > discSize)
 			{
 				x = 0;
 				curr = new Task(0);
@@ -172,6 +195,28 @@ public class DiscScheduler
 			}
 		}
 		return time;
+		
+	}
+	
+	
+	// This algorithm moved head according to task's deadline, takes longer to
+	// complete, but important tasks don't wait too long
+	private int EDF()
+	{
+		
+		Collections.sort(tasks, new Comparator<Task>()
+		{
+			
+			@Override
+			public int compare(Task task1, Task task2)
+			{
+				
+				return task1.deadline - task2.deadline;
+				
+			}
+			
+		});
+		return FCFS();
 		
 	}
 	
@@ -190,28 +235,29 @@ public class DiscScheduler
 	public static void main(String[] args)
 	{
 		
-		// System.out.println(disc.toString());
+		int discSize = 200;
+		int howManyTasks = 100;
+		
 		String FCFS = "FSFC\t ";
 		String SSTF = "SSTF\t ";
 		String SCAN = "SCAN\t ";
 		String CSCAN = "C-SCAN\t ";
+		String EDF = "EDF\t ";
+		
 		for (int x = 0; x < 100; x++)
 		{
-			DiscScheduler disc = new DiscScheduler();
-			disc.addRandom(100);
+			DiscScheduler disc = new DiscScheduler(discSize, howManyTasks);
 			FCFS += disc.FCFS() + "\t";
 			SSTF += disc.SSTF() + "\t";
 			SCAN += disc.SCAN() + "\t";
 			CSCAN += disc.CSCAN() + "\t";
-			// System.out.println("FCFS\t " + disc.FCFS());
-			// System.out.println("SSTF\t " + disc.SSTF());
-			// System.out.println("SCAN\t " + disc.SCAN());
-			// System.out.println("C-SCAN\t " + disc.CSCAN());
+			EDF += disc.EDF() + "\t";
 		}
 		System.out.println(FCFS);
 		System.out.println(SSTF);
 		System.out.println(SCAN);
 		System.out.println(CSCAN);
+		System.out.println(EDF);
 		
 	}
 	
