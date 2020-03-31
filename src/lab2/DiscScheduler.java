@@ -174,25 +174,47 @@ public class DiscScheduler
 	private int CSCAN()
 	{
 		
+		// int time = 0;
+		// Vector<Task> tasks = new Vector<Task>();
+		// tasks.addAll(this.tasks);
+		//
+		// Task curr = tasks.remove(0);
+		// for (int x = curr.position, pos = x; !tasks.isEmpty(); x++, pos =
+		// curr.position)
+		// {
+		// if (x > discSize)
+		// {
+		// x = 0;
+		// curr = new Task(0);
+		// }
+		// if (tasks.contains(new Task(x)))
+		// {
+		// time += Math.abs(x - pos);
+		// curr = new Task(x);
+		// tasks.remove(curr);
+		// x--;
+		// }
+		// }
+		// return time;
+		
 		int time = 0;
 		Vector<Task> tasks = new Vector<Task>();
 		tasks.addAll(this.tasks);
 		
 		Task curr = tasks.remove(0);
-		for (int x = curr.position, pos = x; !tasks.isEmpty(); x++, pos = curr.position)
+		boolean goingLeft = true;
+		for (int x = curr.position, pos = x; !tasks.isEmpty(); pos = curr.position)
 		{
-			if (x > discSize)
-			{
-				x = 0;
-				curr = new Task(0);
-			}
+			if (x < 0) goingLeft = false;
+			if (x > discSize) break;
 			if (tasks.contains(new Task(x)))
 			{
 				time += Math.abs(x - pos);
 				curr = new Task(x);
 				tasks.remove(curr);
-				x--;
 			}
+			else if (goingLeft) x--;
+			else x++;
 		}
 		return time;
 		
@@ -235,8 +257,8 @@ public class DiscScheduler
 	public static void main(String[] args)
 	{
 		
-		int discSize = 200;
-		int howManyTasks = 100;
+		int discSize = 10000;
+		int howManyTasks = 300;
 		
 		String FCFS = "FSFC\t ";
 		String SSTF = "SSTF\t ";
@@ -244,7 +266,7 @@ public class DiscScheduler
 		String CSCAN = "C-SCAN\t ";
 		String EDF = "EDF\t ";
 		
-		for (int x = 0; x < 100; x++)
+		for (int x = 0; x < 50; x++)
 		{
 			DiscScheduler disc = new DiscScheduler(discSize, howManyTasks);
 			FCFS += disc.FCFS() + "\t";
@@ -254,10 +276,10 @@ public class DiscScheduler
 			EDF += disc.EDF() + "\t";
 		}
 		System.out.println(FCFS);
+		System.out.println(EDF);
 		System.out.println(SSTF);
 		System.out.println(SCAN);
 		System.out.println(CSCAN);
-		System.out.println(EDF);
 		
 	}
 	
