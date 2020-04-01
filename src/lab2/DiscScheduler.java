@@ -174,47 +174,25 @@ public class DiscScheduler
 	private int CSCAN()
 	{
 		
-		// int time = 0;
-		// Vector<Task> tasks = new Vector<Task>();
-		// tasks.addAll(this.tasks);
-		//
-		// Task curr = tasks.remove(0);
-		// for (int x = curr.position, pos = x; !tasks.isEmpty(); x++, pos =
-		// curr.position)
-		// {
-		// if (x > discSize)
-		// {
-		// x = 0;
-		// curr = new Task(0);
-		// }
-		// if (tasks.contains(new Task(x)))
-		// {
-		// time += Math.abs(x - pos);
-		// curr = new Task(x);
-		// tasks.remove(curr);
-		// x--;
-		// }
-		// }
-		// return time;
-		
 		int time = 0;
 		Vector<Task> tasks = new Vector<Task>();
 		tasks.addAll(this.tasks);
 		
 		Task curr = tasks.remove(0);
-		boolean goingLeft = true;
-		for (int x = curr.position, pos = x; !tasks.isEmpty(); pos = curr.position)
+		for (int x = curr.position; !tasks.isEmpty(); x++)
 		{
-			if (x < 0) goingLeft = false;
-			if (x > discSize) break;
 			if (tasks.contains(new Task(x)))
 			{
-				time += Math.abs(x - pos);
+				time += x - curr.position;
 				curr = new Task(x);
 				tasks.remove(curr);
+				x--;
 			}
-			else if (goingLeft) x--;
-			else x++;
+			if (x >= discSize)
+			{
+				x = -1;
+				curr = new Task(0);
+			}
 		}
 		return time;
 		
