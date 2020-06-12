@@ -235,8 +235,8 @@ public class DiscScheduler
 	public static void main(String[] args)
 	{
 		
-		int discSize = 10000;
-		int howManyTasks = 300;
+		int discSize = 1000;
+		int howManyTasks = 30;
 		
 		String FCFS = "FSFC\t ";
 		String SSTF = "SSTF\t ";

@@ -54,7 +54,7 @@ public class PageReplacer
 	}
 	
 	
-	private static int OPT(int[] ref, int numberOfFrames)
+	public static int OPT(int[] ref, int numberOfFrames)
 	{
 		
 		int faults = 0;
