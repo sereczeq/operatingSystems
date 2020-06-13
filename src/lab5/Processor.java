@@ -1,6 +1,7 @@
 package lab5;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -10,12 +11,19 @@ public class Processor implements Runnable
 {
 	
 	private String name;
-	int requestsSent = 0;
-	int requestsAccepted = 0;
-	int overload = 0;
+	private int takeRequestsSent = 0;
+	private int giveRequestsSent = 0;
+	private int requestsAccepted = 0;
+	private int overload = 0;
+	private int underload = 0;
+	private int averageCPULoad = 0;
+	private int howManySeconds = 0;
+	private int second = 1000;
+	private int minimumTreshold = 0;
+	private int maximumTreshold = 100;
 	
-	int load = 0;
-	
+	private int load = 0;
+	private boolean canIterate = true;
 	boolean working = true;
 	
 	Vector<Process> processes = new Vector<Process>();
@@ -25,19 +33,25 @@ public class Processor implements Runnable
 	
 	ProcessGenerator generator;
 	
-	public Processor(String name)
+	public Processor(String name, int minimumTreshold, int maximumTreshold, int amountOfProcesses,
+			int minimumProcessTime, int maximumProcessTime, int maximumProcessLoad, int timeBetweenNewProcesses,
+			int second)
 	{
 		
 		this.name = name;
+		this.minimumTreshold = minimumTreshold;
+		this.maximumTreshold = maximumTreshold;
+		this.second = second;
+		generator = new ProcessGenerator(this, amountOfProcesses, minimumProcessTime, maximumProcessTime,
+				maximumProcessLoad, timeBetweenNewProcesses, second);
 		
 	}
 	
 	
-	public void setup(ArrayList<Processor> processors, int amountOfProcesses)
+	public void setProcessors(ArrayList<Processor> processors)
 	{
 		
 		for (Processor x : processors) if (x != this) this.processors.add(x);
-		generator = new ProcessGenerator(amountOfProcesses, this);
 		
 	}
 	
@@ -45,6 +59,7 @@ public class Processor implements Runnable
 	public void run()
 	{
 		
+		System.out.println(name + " started working...");
 		working = true;
 		Thread t = new Thread(generator, name + "'s generator");
 		synchronized (this)
@@ -54,6 +69,7 @@ public class Processor implements Runnable
 		}
 		while (!(processes.isEmpty()) || generator.getGenerating() || !(awaitingProcesses.isEmpty()))
 		{
+			if (!canIterate) continue;
 			Iterator<Process> it = processes.iterator();
 			while (it.hasNext())
 			{
@@ -61,19 +77,40 @@ public class Processor implements Runnable
 				if (!process.tick())
 				{
 					it.remove();
-					load -= process.load;
+					load -= process.getLoad();
 				}
 			}
 			
-			System.out.println(name + "\n" + processes);
-			
+			// synchronized (this)
+			// {
 			if (!awaitingProcesses.isEmpty())
 			{
-				addProcess(awaitingProcesses.poll());
+				try
+				{
+					addProcess(awaitingProcesses.poll());
+				}
+				catch (NullPointerException e)
+				{
+					e.printStackTrace();
+				}
 			}
+			// }
+			
+			if (load < minimumTreshold)
+			{
+				Process process = askForProcess();
+				if (process != null)
+				{
+					processes.add(process);
+					load += process.getLoad();
+				}
+			}
+			
 			try
 			{
-				Thread.sleep(1000);
+				Thread.sleep(second);
+				averageCPULoad += load;
+				howManySeconds++;
 			}
 			catch (InterruptedException e)
 			{
@@ -81,7 +118,7 @@ public class Processor implements Runnable
 			}
 		}
 		working = false;
-		System.out.println("DONE WORKING");
+		System.out.println(name + " DONE WORKING");
 		
 	}
 	
@@ -91,12 +128,8 @@ public class Processor implements Runnable
 		
 		for (Processor x : processors)
 		{
-			requestsSent++;
-			if (x.receiveProcess(process))
-			{
-				System.out.println(name + " sent");
-				return true;
-			}
+			takeRequestsSent++;
+			if (x.receiveProcess(process)) return true;
 		}
 		return false;
 		
@@ -106,10 +139,8 @@ public class Processor implements Runnable
 	private boolean receiveProcess(Process process)
 	{
 		
-		if (load + process.load < 100)
+		if (load + process.getLoad() < 100)
 		{
-			// load += process.load;
-			System.out.println(name + " received");
 			awaitingProcesses.add(process);
 			requestsAccepted++;
 			return true;
@@ -119,13 +150,63 @@ public class Processor implements Runnable
 	}
 	
 	
+	private Process askForProcess()
+	{
+		
+		for (Processor processor : processors)
+		{
+			giveRequestsSent++;
+			try
+			{
+				for (Process process : processor.processes)
+				{
+					if (processor.load - process.getLoad() > minimumTreshold
+							&& load + process.getLoad() < maximumTreshold)
+					{
+						processor.giveProcess(process);
+						return process;
+					}
+				}
+			}
+			catch (ConcurrentModificationException e)
+			{
+				continue;
+			}
+		}
+		underload++;
+		return null;
+		
+	}
+	
+	
+	synchronized void giveProcess(Process process)
+	{
+		
+		canIterate = false;
+		try
+		{
+			Thread.sleep(100);
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		requestsAccepted++;
+		processes.remove(process);
+		load -= process.getLoad();
+		canIterate = true;
+		
+	}
+	
+	
 	void addProcess(Process process)
 	{
 		
-		if (load + process.load < 100)
+		if (load + process.getLoad() < maximumTreshold)
 		{
 			processes.add(process);
-			load += process.load;
+			load += process.getLoad();
 		}
 		else
 		{
@@ -151,6 +232,54 @@ public class Processor implements Runnable
 	{
 		
 		return name;
+		
+	}
+	
+	
+	public int getTakeRequestsSent()
+	{
+		
+		return takeRequestsSent;
+		
+	}
+	
+	
+	public int getGiveRequestsSent()
+	{
+		
+		return giveRequestsSent;
+		
+	}
+	
+	
+	public int getRequestsAccepted()
+	{
+		
+		return requestsAccepted;
+		
+	}
+	
+	
+	public int getOverload()
+	{
+		
+		return overload;
+		
+	}
+	
+	
+	public int getUnderLoad()
+	{
+		
+		return underload;
+		
+	}
+	
+	
+	public int getAverageCPULoad()
+	{
+		
+		return averageCPULoad / howManySeconds;
 		
 	}
 	

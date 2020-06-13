@@ -5,16 +5,27 @@ import java.util.Random;
 public class ProcessGenerator implements Runnable
 {
 	
-	private Processor processor;
-	private int amount;
-	
 	private boolean generating = true;
+	private Processor processor;
 	
-	public ProcessGenerator(int amount, Processor processor)
+	private int amountOfProcesses = 10;
+	private int minimumProcessTime = 2;
+	private int maximumProcessTime = 5;
+	private int maximumProcessCPUload = 50;
+	private int timeBetweenNewProcesses = 3;
+	private int second = 1000;
+	
+	public ProcessGenerator(Processor processor, int amountOfProcesses, int minimumProcessTime, int maximumProcessTime,
+			int maximumProcessCPUload, int timeBetweenNewProcesses, int second)
 	{
 		
-		this.amount = amount;
 		this.processor = processor;
+		this.amountOfProcesses = amountOfProcesses;
+		this.minimumProcessTime = minimumProcessTime;
+		this.maximumProcessTime = maximumProcessTime;
+		this.maximumProcessCPUload = maximumProcessCPUload;
+		this.timeBetweenNewProcesses = timeBetweenNewProcesses;
+		this.second = second;
 		
 	}
 	
@@ -25,13 +36,13 @@ public class ProcessGenerator implements Runnable
 		
 		Random random = new Random();
 		generating = true;
-		for (int x = 0; x < amount; x++)
+		for (int x = 0; x < amountOfProcesses; x++)
 		{
-			Process process = new Process();
+			Process process = new Process(minimumProcessTime, maximumProcessTime, maximumProcessCPUload);
 			processor.addProcess(process);
 			try
 			{
-				Thread.sleep(random.nextInt(5) * 1000);
+				Thread.sleep(random.nextInt(timeBetweenNewProcesses) * second);
 			}
 			catch (InterruptedException e)
 			{

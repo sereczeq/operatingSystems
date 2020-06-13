@@ -5,24 +5,15 @@ import java.util.Random;
 public class Process
 {
 	
-	int time;
-	int load;
+	private int time;
+	private int load;
 	
-	public Process()
+	public Process(int minimumProcessTime, int maximumProcessTime, int maximumProcessCPULoad)
 	{
 		
 		Random random = new Random();
-		time = random.nextInt(10) + 5;
-		load = random.nextInt(7) * 10;
-		
-	}
-	
-	
-	public Process(int time, int load)
-	{
-		
-		this.time = time;
-		this.load = load;
+		time = random.nextInt(maximumProcessTime - minimumProcessTime) + minimumProcessTime;
+		load = random.nextInt(maximumProcessCPULoad / 10) * 10; // so it's always multiple of 10
 		
 	}
 	
@@ -32,6 +23,14 @@ public class Process
 	{
 		
 		return time-- > 0;
+		
+	}
+	
+	
+	public int getLoad()
+	{
+		
+		return load;
 		
 	}
 	
