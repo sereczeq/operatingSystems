@@ -133,8 +133,7 @@ public class DiscScheduler
 	
 	
 	// This algorithm moves the head from the first task to the very left side of
-	// the
-	// disc, then to the right and so on
+	// the disc, then to the right and so on
 	private int SCAN()
 	{
 		

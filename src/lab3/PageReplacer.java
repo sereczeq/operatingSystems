@@ -12,14 +12,14 @@ public class PageReplacer
 	public static void main(String[] args)
 	{
 		
-		@SuppressWarnings("unused")
-		int amountOfReferences = 50;
-		@SuppressWarnings("unused")
-		int locality = 8;
 		int frames = 3;
+		
+		int amountOfReferences = 50;
+		int locality = 8;
+		
 		int[] referenceString = {1, 2, 3, 4, 5, 1, 7, 1, 3, 1, 2, 3, 3, 3, 1, 5, 1, 3 };
-		// can use either pre generated reference string or generate new one
-		// referenceString = generateReferences(amountOfReferences, locality);
+		// can use either pre-generated reference string or generate new one
+		referenceString = generateReferences(amountOfReferences, locality);
 		System.out.println("FIFO:\t" + FIFO(referenceString, frames));
 		System.out.println("OPT:\t" + OPT(referenceString, frames));
 		System.out.println("LRU:\t" + LRU(referenceString, frames));
