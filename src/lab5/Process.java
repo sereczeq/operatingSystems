@@ -12,8 +12,8 @@ public class Process
 	{
 		
 		Random random = new Random();
-		time = random.nextInt(5);
-		load = random.nextInt(10) * 10;
+		time = random.nextInt(10) + 5;
+		load = random.nextInt(7) * 10;
 		
 	}
 	
@@ -32,6 +32,15 @@ public class Process
 	{
 		
 		return time-- > 0;
+		
+	}
+	
+	
+	@Override
+	public String toString()
+	{
+		
+		return "Process: time - " + time + ", load - " + load;
 		
 	}
 	

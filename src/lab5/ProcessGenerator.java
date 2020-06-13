@@ -5,8 +5,10 @@ import java.util.Random;
 public class ProcessGenerator implements Runnable
 {
 	
-	Processor processor;
-	int amount;
+	private Processor processor;
+	private int amount;
+	
+	private boolean generating = true;
 	
 	public ProcessGenerator(int amount, Processor processor)
 	{
@@ -17,17 +19,12 @@ public class ProcessGenerator implements Runnable
 	}
 	
 	
-	public void start()
-	{
-		
-	}
-	
-	
 	@Override
 	public void run()
 	{
 		
 		Random random = new Random();
+		generating = true;
 		for (int x = 0; x < amount; x++)
 		{
 			Process process = new Process();
@@ -38,10 +35,18 @@ public class ProcessGenerator implements Runnable
 			}
 			catch (InterruptedException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		generating = false;
+		
+	}
+	
+	
+	public boolean getGenerating()
+	{
+		
+		return generating;
 		
 	}
 	
