@@ -28,8 +28,8 @@ public class Main
 		
 		ArrayList<Process> processes = ProcessGenerator.generate(amountOfProcesses, amountOfPages, range);
 		
+		Random random = new Random();
 		Proportional proportional = new Proportional();
-		Equal equal = new Equal();
 		PFF pff = new PFF();
 		WorkingSet workingSet = new WorkingSet();
 		
@@ -39,7 +39,7 @@ public class Main
 		string += "\n\nAmount of faults for each process, for different algorithms\n";
 		string += "Proportional:\t\t\t\t" + proportional.faults(processes, amountOfFrames);
 		string += "\n";
-		string += "Equal:\t\t\t\t\t" + equal.faults(processes, amountOfFrames);
+		string += "Random:\t\t\t\t\t" + random.faults(processes, amountOfFrames);
 		string += "\n";
 		string += "Page Foult Frequency with rate " + controlRatePer10Pages + ":\t"
 				+ pff.faults(processes, amountOfFrames, controlRatePer10Pages);

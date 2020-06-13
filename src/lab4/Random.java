@@ -7,13 +7,13 @@ import java.util.ArrayList;
  * This is not ideal, because sometimes it may even leave some unused frames, if processes don't need this many,
  * while other processes might not get enough frames
  */
-public class Equal implements IAllocator
+public class Random implements IAllocator
 {
 	
 	public ArrayList<Integer> faults(ArrayList<Process> processes, int amountOfFrames)
 	{
 		
-		// giving each process exactly the same amount of frames
+		// giving each process random
 		setAllFrames(processes, getNumberOfPages(processes) / amountOfFrames);
 		calculateFaults(processes);
 		return getFaults(processes);
