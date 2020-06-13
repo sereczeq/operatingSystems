@@ -2,6 +2,11 @@ package lab4;
 
 import java.util.ArrayList;
 
+/*
+ * Equal algorithm distributes frames evenly to every process, no matter how many frames it needs
+ * This is not ideal, because sometimes it may even leave some unused frames, if processes don't need this many,
+ * while other processes might not get enough frames
+ */
 public class Equal implements IAllocator
 {
 	
@@ -62,7 +67,7 @@ public class Equal implements IAllocator
 			for (int i = 0; i < processes.size(); i++)
 			{
 				goOn = false;
-				if (processes.get(i).LRUOnFrames(-1)) goOn = true;
+				if (processes.get(i).LRU(-1)) goOn = true;
 			}
 		}
 		

@@ -3,21 +3,23 @@ package lab4;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+/*
+ * This class handles all neccessary operations
+ * Just a helper class
+ */
 public class Process
 {
 	
 	public ArrayList<Integer> pages;
 	private ArrayList<Integer> frames;
 	private ArrayList<Integer> counter;
-	private int numberOfReplacements;
-	private int i;
+	private int amountOfFaults = 0;
+	private int i = 0;
 	
 	public Process(ArrayList<Integer> pages)
 	{
 		
 		this.pages = pages;
-		numberOfReplacements = 0;
-		i = 0;
 		
 	}
 	
@@ -27,8 +29,6 @@ public class Process
 		
 		frames = new ArrayList<>();
 		counter = new ArrayList<>();
-		frames.clear();
-		counter.clear();
 		
 		for (int i = 0; i <= amountOfFrames; i++)
 		{
@@ -39,6 +39,7 @@ public class Process
 	}
 	
 	
+	// sets a working set
 	public TreeSet<Integer> getDivide(int delta)
 	{
 		
@@ -55,13 +56,13 @@ public class Process
 	}
 	
 	
-	public boolean LRUOnFrames(double rate)
+	public boolean LRU(double rate)
 	{
 		
 		if (i == pages.size()) return false;
 		int current = pages.get(i);
 		int currentFrame;
-		if (!isNotExist(frames, current))
+		if (!doesNotExist(frames, current))
 		{
 			for (int j = 0; j < frames.size(); j++)
 			{
@@ -73,14 +74,16 @@ public class Process
 			currentFrame = getHighestFrame();
 			frames.set(currentFrame, current);
 			counter.set(currentFrame, 0);
-			numberOfReplacements++;
+			amountOfFaults++;
 		}
 		tickCounter(counter);
 		i++;
+		// if rate is equal to -1, means it's not needed in algorithm that called this
+		// method
 		if (rate != -1)
 		{
-			if (rate > numberOfReplacements % 10) removeFrame();
-			if (rate < numberOfReplacements % 10) addFrame();
+			if (rate > amountOfFaults % 10) removeFrame();
+			if (rate < amountOfFaults % 10) addFrame();
 		}
 		return true;
 		
@@ -113,7 +116,7 @@ public class Process
 	}
 	
 	
-	private boolean isNotExist(ArrayList<Integer> frames, int current)
+	private boolean doesNotExist(ArrayList<Integer> frames, int current)
 	{
 		
 		for (int i = 0; i < frames.size(); i++)
@@ -165,7 +168,7 @@ public class Process
 	public int getNumberOfReplacements()
 	{
 		
-		return numberOfReplacements;
+		return amountOfFaults;
 		
 	}
 	
@@ -176,7 +179,7 @@ public class Process
 		frames.clear();
 		counter.clear();
 		i = 0;
-		numberOfReplacements = 0;
+		amountOfFaults = 0;
 		
 	}
 	

@@ -2,6 +2,10 @@ package lab4;
 
 import java.util.ArrayList;
 
+/*
+ * Proportional algorithm distributes frames proportionally to process' needs
+ * Thanks to this smaller processes aren't taking too many frames
+ */
 public class Proportional implements IAllocator
 {
 	
@@ -60,7 +64,7 @@ public class Proportional implements IAllocator
 			for (int i = 0; i < processes.size(); i++)
 			{
 				goOn = false;
-				if (processes.get(i).LRUOnFrames(-1)) goOn = true;
+				if (processes.get(i).LRU(-1)) goOn = true;
 			}
 		}
 		

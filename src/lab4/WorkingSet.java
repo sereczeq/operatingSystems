@@ -2,6 +2,13 @@ package lab4;
 
 import java.util.ArrayList;
 
+/*
+ * Working set algorithm:
+ * To make page replacing more efficient, a working set can be declared.
+ * From all pages we choose ones that will be in used constantly, and ones that will be free.
+ * When process needs to use more frames: instead of deleting currently used frame and replacing it with new needed one,
+ * the algorithm gives free frame to the process, so it can do whatever it needs to do, and then frees some other frame, speeding up the process
+ */
 public class WorkingSet implements IAllocator
 {
 	
@@ -55,7 +62,7 @@ public class WorkingSet implements IAllocator
 				goOn = false;
 				if (!checkForOverflow(processes, amountOfFrames, delta))
 				{
-					if (processes.get(i).LRUOnFrames(-1)) goOn = true;
+					if (processes.get(i).LRU(-1)) goOn = true;
 					takeFrame(giveAway, processes);
 				}
 				else
