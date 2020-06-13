@@ -14,9 +14,10 @@ public class ProcessGenerator implements Runnable
 	private int maximumProcessCPUload = 50;
 	private int timeBetweenNewProcesses = 3;
 	private int second = 1000;
+	private boolean print = false;
 	
 	public ProcessGenerator(Processor processor, int amountOfProcesses, int minimumProcessTime, int maximumProcessTime,
-			int maximumProcessCPUload, int timeBetweenNewProcesses, int second)
+			int maximumProcessCPUload, int timeBetweenNewProcesses, int second, boolean print)
 	{
 		
 		this.processor = processor;
@@ -26,6 +27,7 @@ public class ProcessGenerator implements Runnable
 		this.maximumProcessCPUload = maximumProcessCPUload;
 		this.timeBetweenNewProcesses = timeBetweenNewProcesses;
 		this.second = second;
+		this.print = print;
 		
 	}
 	
@@ -40,8 +42,10 @@ public class ProcessGenerator implements Runnable
 		{
 			Process process = new Process(minimumProcessTime, maximumProcessTime, maximumProcessCPUload);
 			processor.addProcess(process);
+			if (print) System.out.println("[GENERATOR]: " + process + " sent to " + processor.getName());
 			try
 			{
+				// random time between creating new processes
 				Thread.sleep(random.nextInt(timeBetweenNewProcesses) * second);
 			}
 			catch (InterruptedException e)

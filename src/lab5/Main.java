@@ -5,28 +5,76 @@ import java.util.ArrayList;
 public class Main
 {
 	
+	/*
+	 * Program simulates processors communicating in real time: For every processor
+	 * there is a Process Generator, that generates random processes at random
+	 * intervals of time. Every Process has two values: time needed to finish it,
+	 * and CPU load it takes. Each processor takes the tasks and decides what to do
+	 * with them (based on given parameters.) Every second processors "execute" one
+	 * second of every task they have. If the task is executed (means it has been in
+	 * processor for specified amount of time), it is being removed from processor,
+	 * and it's load is freed.
+	 * 
+	 * Printing can be turned off!
+	 * 
+	 * Program uses multi-threading (which I haven't mastered yet); hence there may
+	 * be some errors happening. If any occur, program has to be restarted :( The
+	 * more migrations the more chance to get an error
+	 */
 	public static void main(String[] args)
 	{
 		
+		// Processors
 		int amountOfProcessors = 5;
-		int minimumTreshold = 0; // if set to 0 - program will work at maximum treshold
-		int maximumTreshold = 70; // if set to 100 - program will work as random
+		int minimumTreshold = 30;
+		/*
+		 * if minimum threshold will be set to 0 - program will work at maximum
+		 * threshold only: "give" requests should be zero, because processors will not
+		 * try to get more work. Also processors will never be underloaded.
+		 */
+		int maximumTreshold = 70;
+		/*
+		 * if maximum threshold is set to 100 and minimum to nonzero number, program
+		 * will work at minimum threshold We can expect a lot of "give" requests and a
+		 * lot of migration
+		 * 
+		 * if maximum threshold is set to 100, and minimum to 0 - program will work as
+		 * random We can expect less "give"and "take" requests, but average CPU load
+		 * will be relatively high. There also should be a lot less process migrations
+		 */
+		
+		// Processes
 		int amountOfProcesses = 10; // per processor
 		int minimumTaskTime = 2;
 		int maximumTaskTime = 10;
 		int maximumTaskCPULoad = 50;
-		int timeBetweenNewProcesses = 3;
-		int second = 500;
 		
-		// seting up processors
+		// User experience
+		boolean print = true;
+		int timeBetweenNewProcesses = 3;
+		int second = 500; // 1000 units is exactly one second (the bigger the value, the less likely for
+							// errors to happen)
+		
+		go(amountOfProcessors, minimumTreshold, maximumTreshold, amountOfProcesses, minimumTaskTime, maximumTaskTime,
+				maximumTaskCPULoad, timeBetweenNewProcesses, second, print);
+		
+	}
+	
+	
+	private static void go(int amountOfProcessors, int minimumTreshold, int maximumTreshold, int amountOfProcesses,
+			int minimumTaskTime, int maximumTaskTime, int maximumTaskCPULoad, int timeBetweenNewProcesses, int second,
+			boolean print)
+	{
+		
+		// setting up processors
 		ArrayList<Processor> processors = new ArrayList<Processor>();
 		for (int x = 0; x < amountOfProcessors; x++)
 		{
-			processors.add(
-					new Processor("Processor" + x, minimumTreshold, maximumTreshold, amountOfProcesses, minimumTaskTime,
-							maximumTaskTime - minimumTaskTime, maximumTaskCPULoad, timeBetweenNewProcesses, second));
+			processors.add(new Processor("Processor" + x, minimumTreshold, maximumTreshold, amountOfProcesses,
+					minimumTaskTime, maximumTaskTime - minimumTaskTime, maximumTaskCPULoad, timeBetweenNewProcesses,
+					second, print));
 		}
-		// giving each procesor information about other procesors
+		// giving each processor information about other processors
 		for (Processor processor : processors)
 		{
 			processor.setProcessors(processors);
